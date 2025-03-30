@@ -1,0 +1,76 @@
+docker network create mongoCluster2
+
+docker run -d --rm -p 27001:27017 --name mongo201 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo201
+
+docker run -d --rm -p 27002:27017 --name mongo202 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo202
+
+docker run -d --rm -p 27003:27017 --name mongo203 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo203
+
+docker run -d --rm -p 27004:27017 --name mongo204 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo204
+
+docker exec -it mongo201 mongosh
+
+db.runCommand ({hello:1})
+
+rs.initiate ({ _id: "myReplicaSet", members:[{_id:0, host: "mongo201"}, {_id:1, host: "mongo202"}, {_id:3, host: "mongo203"},{_id:4, host: "mongo204"}]})
+
+exit
+
+docker exec -it mongo201 mongosh --eval "rs.status()"
+
+rs.isMaster().primary
+
+use CorporeSystem
+
+db.cliente.insertOne({codigo:1, nome: "Lucas Barros"});
+db.cliente.insertOne({codigo:2, nome: "Larissa Tobias"});
+db.cliente.insertOne({codigo:3, nome: "Luis Filipe"});
+db.cliente.insertOne({codigo:4, nome: "Larissa Biagi"});
+db.cliente.insertOne({codigo:5, nome: "Lula da Silva"});
+
+db.cliente.find()
+
+docker stop mongo203
+
+db.cliente.insertOne({codigo:6, nome: "Jair Bolsonaro"});
+
+db.cliente.find()
+
+docker run -d --rm -p 27003:27017 --name mongo203 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo203
+
+docker stop mongo203
+
+docker exec -it mongo201 mongosh --eval "rs.status()"
+
+docker run -d --rm -p 27003:27017 --name mongo203 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo203
+
+docker exec -it mongo201 mongosh --eval "rs.status()"
+
+docker stop mongo201
+
+docker exec -it mongo202 mongosh --eval "rs.status()"
+
+db.cliente.insertOne({codigo:7, nome: "Luciana Pereira"});
+
+db.cliente.insertOne({codigo:7, nome: "Luciana Pereira"});
+
+db.cliente.find()
+
+docker run -d --rm -p 27001:27017 --name mongo201 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo201
+
+docker exec -it mongo201 mongosh --eval "rs.status()"
+
+db.cliente.insertOne({codigo:8, nome: "Luisa Marea"});
+
+db.cliente.find()
+
+db.cliente.insertOne({codigo:9, nome: "Luisa Marea"});
+
+docker run -d --rm -p 27004:27017 --name mongo204 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo204
+
+docker exec -it mongo203 mongosh
+
+exit
+
+docker exec -it mongo203 mongosh
+
